@@ -93,10 +93,32 @@
             font-weight: bold;
         }
 
-        canvas {
+        .show-graph-btn {
             margin-top: 20px;
-            width: 90%;
-            max-width: 600px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .show-graph-btn:hover {
+            background-color: var(--text-color);
+        }
+
+        .ping-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            font-size: 0.9em;
+            color: var(--text-color);
         }
 
         @keyframes slideIn {
@@ -128,60 +150,31 @@
         <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
     </header>
 
-    <div class="speedtest-container">
-        <div class="circle" id="speed">0 Mbps</div>
-        <canvas id="speedChart"></canvas>
+    <div class="ping-display" id="pingDisplay">
+        <p>Google: <span id="pingGoogle">-</span> ms</p>
+        <p>Facebook: <span id="pingFacebook">-</span> ms</p>
+        <p>Fortnite EU: <span id="pingFortnite">-</span> ms</p>
+        <p>TikTok: <span id="pingTikTok">-</span> ms</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="speedtest-container">
+        <div class="circle" id="speed">0 Mbps</div>
+        <button class="show-graph-btn" onclick="toggleGraph()">Show Graph</button>
+    </div>
+
+    <div id="graph" style="display:none; text-align:center; margin-top:20px;">
+        <p>Graph coming soon...</p>
+    </div>
+
     <script>
         const speedElement = document.getElementById('speed');
-        const ctx = document.getElementById('speedChart').getContext('2d');
-
-        // Data for speed tests
-        const speedData = [];
-        const labels = [];
-
-        // Chart configuration
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Speed (Mbps)',
-                    data: speedData,
-                    borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Test Number'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Speed (Mbps)'
-                        }
-                    }
-                }
-            }
-        });
+        const graphElement = document.getElementById('graph');
 
         // Simulate speed test
         function runSpeedTest() {
-            const speed = (Math.random() * 100).toFixed(2);
-            speedElement.textContent = `${speed} Mbps`;
-            speedData.push(speed);
-            labels.push(`Test ${labels.length + 1}`);
-            chart.update();
+            const speedMbps = (Math.random() * 2000).toFixed(2); // Max 2000 Mbps for testing
+            const displaySpeed = speedMbps >= 1000 ? `${(speedMbps / 1000).toFixed(2)} GB` : `${speedMbps} Mbps`;
+            speedElement.textContent = displaySpeed;
         }
 
         // Automatic testing every 3 seconds
@@ -192,6 +185,38 @@
             const body = document.body;
             body.dataset.theme = body.dataset.theme === 'light' ? 'dark' : 'light';
         }
+
+        // Toggle graph visibility
+        function toggleGraph() {
+            if (graphElement.style.display === 'none') {
+                graphElement.style.display = 'block';
+            } else {
+                graphElement.style.display = 'none';
+            }
+        }
+
+        // Ping servers
+        async function pingServer(server, elementId) {
+            const start = performance.now();
+            try {
+                await fetch(server, { method: 'HEAD', mode: 'no-cors' });
+                const latency = (performance.now() - start).toFixed(2);
+                document.getElementById(elementId).textContent = `${latency} ms`;
+            } catch {
+                document.getElementById(elementId).textContent = 'Error';
+            }
+        }
+
+        function updatePings() {
+            pingServer('https://google.com', 'pingGoogle');
+            pingServer('https://facebook.com', 'pingFacebook');
+            pingServer('https://ping-eu.ds.on.epicgames.com', 'pingFortnite');
+            pingServer('https://tiktok.com', 'pingTikTok');
+        }
+
+        // Update pings every 5 seconds
+        setInterval(updatePings, 5000);
+        updatePings();
     </script>
 </body>
 </html>
