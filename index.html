@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpeedTest - GitHub Servers</title>
+    <title>SpeedTest App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-color: #4f46e5;
@@ -12,12 +13,6 @@
             --card-bg: #ffffff;
             --border-color: #e5e7eb;
             --shadow-color: rgba(0, 0, 0, 0.1);
-            --warning-bg: #fee2e2;
-            --warning-text: #991b1b;
-            --success-bg: #dcfce7;
-            --success-text: #166534;
-            --moderate-bg: #fef3c7;
-            --moderate-text: #92400e;
         }
 
         [data-theme="dark"] {
@@ -27,12 +22,6 @@
             --card-bg: #1f2937;
             --border-color: #374151;
             --shadow-color: rgba(0, 0, 0, 0.3);
-            --warning-bg: #7f1d1d;
-            --warning-text: #fecaca;
-            --success-bg: #064e3b;
-            --success-text: #dcfce7;
-            --moderate-bg: #78350f;
-            --moderate-text: #fef3c7;
         }
 
         * {
@@ -46,176 +35,333 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.6;
             min-height: 100vh;
+            padding: 2rem;
         }
 
-        header {
-            padding: 20px;
-            text-align: center;
-            background-color: var(--primary-color);
-            color: var(--bg-color);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
         }
 
         .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
             background: none;
-            border: 2px solid var(--bg-color);
-            color: var(--bg-color);
-            padding: 5px 10px;
+            border: none;
+            color: var(--text-color);
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-color);
-            color: var(--primary-color);
+            font-size: 1.5rem;
+            padding: 0.5rem;
         }
 
         .speedtest-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px;
-        }
-
-        .circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 8px solid var(--primary-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        .show-graph-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .show-graph-btn:hover {
-            background-color: var(--text-color);
-        }
-
-        .ping-display {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 4px 6px var(--shadow-color);
-            font-size: 0.9em;
-            color: var(--text-color);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
         }
 
         .card {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
             border-radius: 1rem;
             padding: 2rem;
-            margin-bottom: 2rem;
             box-shadow: 0 4px 6px var(--shadow-color);
-            border: 1px solid var(--border-color);
-            animation: slideIn 0.5s ease-out;
         }
 
+        .speed-circle {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto;
+        }
+
+        .circle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .speed-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .speed-unit {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        .server-select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .start-test {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .ping-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .ping-card {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .ping-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        #speedGraph {
+            width: 100%;
+            height: 300px;
+        }
     </style>
 </head>
-<body data-theme="light">
-    <header>
-        <h1>SpeedTest - GitHub Servers</h1>
-        <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
-    </header>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SpeedTest</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
 
-    <div class="ping-display" id="pingDisplay">
-        <p>Google: <span id="pingGoogle">-</span> ms</p>
-        <p>Facebook: <span id="pingFacebook">-</span> ms</p>
-        <p>Fortnite EU: <span id="pingFortnite">-</span> ms</p>
-        <p>TikTok: <span id="pingTikTok">-</span> ms</p>
+        <div class="speedtest-container">
+            <div class="card">
+                <select class="server-select">
+                    <option value="github">GitHub Servers</option>
+                </select>
+                <button class="start-test" onclick="startTest()">Start Test</button>
+                <div class="speed-circle">
+                    <canvas id="speedCanvas" class="circle-canvas"></canvas>
+                    <div class="speed-value">
+                        0<br>
+                        <span class="speed-unit">Mbps</span>
+                    </div>
+                </div>
+                <div class="ping-container">
+                    <div class="ping-card">
+                        <h3>Google</h3>
+                        <div class="ping-value">-- ms</div>
+                    </div>
+                    <div class="ping-card">
+                        <h3>Facebook</h3>
+                        <div class="ping-value">-- ms</div>
+                    </div>
+                    <div class="ping-card">
+                        <h3>Fortnite EU</h3>
+                        <div class="ping-value">-- ms</div>
+                    </div>
+                    <div class="ping-card">
+                        <h3>TikTok</h3>
+                        <div class="ping-value">-- ms</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <canvas id="speedGraph"></canvas>
+            </div>
+        </div>
     </div>
 
-    <div class="speedtest-container">
-        <div class="circle" id="speed">0 Mbps</div>
-        <button class="show-graph-btn" onclick="toggleGraph()">Show Graph</button>
-    </div>
-
-    <div id="graph" style="display:none; text-align:center; margin-top:20px;">
-        <p>Graph coming soon...</p>
-    </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script>
-        const speedElement = document.getElementById('speed');
-        const graphElement = document.getElementById('graph');
+        let isDark = false;
+        const speedHistory = [];
+        let chart;
 
-        // Simulate speed test
-        function runSpeedTest() {
-            const speedMbps = (Math.random() * 2000).toFixed(2); // Max 2000 Mbps for testing
-            const displaySpeed = speedMbps >= 1000 ? `${(speedMbps / 1000).toFixed(2)} GB` : `${speedMbps} Mbps`;
-            speedElement.textContent = displaySpeed;
-        }
-
-        // Automatic testing every 3 seconds
-        setInterval(runSpeedTest, 3000);
-
-        // Theme toggle
         function toggleTheme() {
-            const body = document.body;
-            body.dataset.theme = body.dataset.theme === 'light' ? 'dark' : 'light';
+            isDark = !isDark;
+            document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.querySelector('.theme-toggle i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            updateChart();
         }
 
-        // Toggle graph visibility
-        function toggleGraph() {
-            if (graphElement.style.display === 'none') {
-                graphElement.style.display = 'block';
-            } else {
-                graphElement.style.display = 'none';
+        function initSpeedCanvas() {
+            const canvas = document.getElementById('speedCanvas');
+            canvas.width = 300;
+            canvas.height = 300;
+            return canvas.getContext('2d');
+        }
+
+        function drawSpeedCircle(ctx, speed) {
+            const centerX = 150;
+            const centerY = 150;
+            const radius = 120;
+
+            ctx.clearRect(0, 0, 300, 300);
+
+            // Background circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = isDark ? '#374151' : '#e5e7eb';
+            ctx.lineWidth = 10;
+            ctx.stroke();
+
+            // Speed indicator
+            const percentage = Math.min(speed / 100, 1);
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, -Math.PI / 2, (-Math.PI / 2) + (2 * Math.PI * percentage));
+            ctx.strokeStyle = '#4f46e5';
+            ctx.stroke();
+
+            // Update speed value
+            document.querySelector('.speed-value').innerHTML = `${speed}<br><span class="speed-unit">Mbps</span>`;
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('speedGraph').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Speed (Mbps)',
+                        data: [],
+                        borderColor: '#4f46e5',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: isDark ? '#374151' : '#e5e7eb'
+                            },
+                            ticks: {
+                                color: isDark ? '#f3f4f6' : '#1f2937'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: isDark ? '#374151' : '#e5e7eb'
+                            },
+                            ticks: {
+                                color: isDark ? '#f3f4f6' : '#1f2937'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: isDark ? '#f3f4f6' : '#1f2937'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            if (chart) {
+                chart.options.scales.y.grid.color = isDark ? '#374151' : '#e5e7eb';
+                chart.options.scales.x.grid.color = isDark ? '#374151' : '#e5e7eb';
+                chart.options.scales.y.ticks.color = isDark ? '#f3f4f6' : '#1f2937';
+                chart.options.scales.x.ticks.color = isDark ? '#f3f4f6' : '#1f2937';
+                chart.options.plugins.legend.labels.color = isDark ? '#f3f4f6' : '#1f2937';
+                chart.update();
             }
         }
 
-        // Ping servers
-        async function pingServer(server, elementId) {
+        async function pingServer(url) {
             const start = performance.now();
             try {
-                await fetch(server, { method: 'HEAD', mode: 'no-cors' });
-                const latency = (performance.now() - start).toFixed(2);
-                document.getElementById(elementId).textContent = `${latency} ms`;
-            } catch {
-                document.getElementById(elementId).textContent = 'Error';
+                await fetch(`https://${url}`, { mode: 'no-cors' });
+                const end = performance.now();
+                return Math.round(end - start);
+            } catch (error) {
+                return '--';
             }
         }
 
-        function updatePings() {
-            pingServer('https://google.com', 'pingGoogle');
-            pingServer('https://facebook.com', 'pingFacebook');
-            pingServer('https://ping-eu.ds.on.epicgames.com', 'pingFortnite');
-            pingServer('https://tiktok.com', 'pingTikTok');
+        async function updatePings() {
+            const servers = [
+                { url: 'google.com', name: 'Google' },
+                { url: 'facebook.com', name: 'Facebook' },
+                { url: 'ping-eu.ds.on.epicgames.com', name: 'Fortnite EU' },
+                { url: 'tiktok.com', name: 'TikTok' }
+            ];
+
+            for (const server of servers) {
+                const ping = await pingServer(server.url);
+                const card = document.querySelector(`.ping-card:has(h3:contains('${server.name}')) .ping-value`);
+                card.textContent = ping === '--' ? '--' : `${ping} ms`;
+            }
         }
 
-        // Update pings every 5 seconds
-        setInterval(updatePings, 5000);
+        async function startTest() {
+            const ctx = initSpeedCanvas();
+            const button = document.querySelector('.start-test');
+            button.disabled = true;
+            button.textContent = 'Testing...';
+
+            // Simulate speed test
+            let speed = 0;
+            const maxSpeed = Math.random() * 50 + 50; // Random speed between 50-100 Mbps
+            const interval = setInterval(() => {
+                speed += (maxSpeed - speed) * 0.1;
+                drawSpeedCircle(ctx, Math.round(speed));
+                if (Math.abs(maxSpeed - speed) < 0.1) {
+                    clearInterval(interval);
+                    button.disabled = false;
+                    button.textContent = 'Start Test';
+                    
+                    // Update history
+                    const now = new Date();
+                    speedHistory.push({
+                        time: now.toLocaleTimeString(),
+                        speed: Math.round(speed)
+                    });
+                    
+                    // Update chart
+                    chart.data.labels = speedHistory.map(h => h.time);
+                    chart.data.datasets[0].data = speedHistory.map(h => h.speed);
+                    chart.update();
+                }
+            }, 50);
+
+            // Update pings
+            await updatePings();
+        }
+
+        // Initialize
+        initSpeedCanvas();
+        initChart();
         updatePings();
     </script>
 </body>
