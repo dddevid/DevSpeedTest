@@ -310,19 +310,31 @@
         }
 
         async function updatePings() {
-            const servers = [
-                { url: 'google.com', name: 'Google' },
-                { url: 'facebook.com', name: 'Facebook' },
-                { url: 'ping-eu.ds.on.epicgames.com', name: 'Fortnite EU' },
-                { url: 'tiktok.com', name: 'TikTok' }
-            ];
+    const servers = [
+        { url: 'google.com', name: 'Google' },
+        { url: 'facebook.com', name: 'Facebook' },
+        { url: 'ping-eu.ds.on.epicgames.com', name: 'Fortnite EU' },
+        { url: 'tiktok.com', name: 'TikTok' }
+    ];
 
-            for (const server of servers) {
-                const ping = await pingServer(server.url);
-                const card = document.querySelector(`.ping-card:has(h3:contains('${server.name}')) .ping-value`);
-                card.textContent = ping === '--' ? '--' : `${ping} ms`;
+    for (const server of servers) {
+        const ping = await pingServer(server.url);
+
+        // Trova la card basandoti sul testo del titolo
+        const cards = document.querySelectorAll('.ping-card');
+        for (const card of cards) {
+            const title = card.querySelector('h3');
+            if (title && title.textContent === server.name) {
+                const valueElement = card.querySelector('.ping-value');
+                if (valueElement) {
+                    valueElement.textContent = ping === '--' ? '--' : `${ping} ms`;
+                }
+                break;
             }
         }
+    }
+}
+
 
         async function startTest() {
             const ctx = initSpeedCanvas();
